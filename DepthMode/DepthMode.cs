@@ -12,10 +12,11 @@ namespace DepthModeMod {
 		/// <summary>
 		/// The frequency at which <see cref="Camera.main"/> is referenced and has its depth mode updated.
 		/// </summary>
-		private const float UPDATE_RATE = 0.5f;
+		private const float UPDATE_DELAY = 0.5f;
 
 		/// <summary>
 		/// The amount of time counted since the last OnUpdate call.
+		/// This is lazier than caching the information of the last user-set mode, but makes it resistant
 		/// </summary>
 		private float _totalDelta = 0;
 
@@ -24,10 +25,14 @@ namespace DepthModeMod {
 		}
 
 		public override void OnUpdate() {
+			// TODO: Camera.current? The VRC mod I made for my Seeker used Camera.main so I will use that here too.
+			Camera mainCamera = Camera.main;
+			if (mainCamera == null) return;
+
 			_totalDelta += Time.deltaTime;
-			if (_totalDelta >= UPDATE_RATE) {
+			if (_totalDelta >= UPDATE_DELAY) {
 				_totalDelta = 0;
-				Camera.main.depthTextureMode = Prefs.DepthMode;
+				mainCamera.depthTextureMode = Prefs.DepthMode;
 			}
 		}
 	}
